@@ -7,7 +7,18 @@ from datetime import datetime, timedelta
 clients = {
     "Cognito Therapeutics": ["Cognito Therapeutics"],
     "Astria Therapeutics": ["Astria Therapeutics"],
-    "Hansa Biopharma": ["Hansa Biopharma"]
+    "Hansa Biopharma": ["Hansa Biopharma"],
+    "Tempest Therapeutics": ["Tempest Therapeutics"],
+    "Sensius Thermotherapy": ["Sensius Thermotherapy"]
+}
+
+# --- Client Logo Map ---
+client_logos = {
+    "Cognito Therapeutics": "https://files.oaiusercontent.com/file-XH26X7d1L4TBoouauFuYQY?filename=cognito.png",
+    "Astria Therapeutics": "https://files.oaiusercontent.com/file-LswgoQDW9WhKUxvMNUxSsL?filename=astria.png",
+    "Hansa Biopharma": "https://files.oaiusercontent.com/file-QQCRM4i6CUzKbKd476ZhTc?filename=hansa.png",
+    "Tempest Therapeutics": "https://files.oaiusercontent.com/file-5AzVzackqARpJeJeWmN5Gf?filename=tempest.png",
+    "Sensius Thermotherapy": "https://files.oaiusercontent.com/file-8pkPv874tRs1jermmdPqfD?filename=sensius.png"
 }
 
 # --- Keywords for Categorization ---
@@ -21,14 +32,15 @@ categories = {
     "Commercial Move": ["launch", "commercial", "pricing", "reimbursement", "market access"],
     "Investor Relations": ["earnings", "quarterly", "shareholder", "investor", "guidance"],
     "Pipeline Milestone": ["milestone", "readout", "development", "update"],
-    "Conference/Presentation": ["conference", "presenting at", "presentation", "poster", "abstract"],
+    "Upcoming Event": ["conference", "presenting at", "presentation", "poster", "abstract", "upcoming", "speaking at", "webinar"],
     "Setback/Risk": ["pause", "terminated", "hold", "FDA rejection", "negative"]
 }
 
 # --- Strategic Groupings ---
 rd_cats = ["Clinical Trial", "Data/Publication", "Pipeline Milestone"]
 corp_cats = ["Funding", "Leadership Change", "Partnership/Acquisition", "Investor Relations"]
-risk_cats = ["Regulatory Update", "Setback/Risk", "Commercial Move", "Conference/Presentation"]
+risk_cats = ["Regulatory Update", "Setback/Risk", "Commercial Move"]
+event_cats = ["Upcoming Event"]
 
 # --- Utility Functions ---
 def get_rss_url(query):
@@ -75,6 +87,10 @@ client_selection = st.sidebar.selectbox("Select client to view", list(clients.ke
 search_query = st.sidebar.text_input("Search keyword")
 recent_only = st.sidebar.checkbox("Show only last 7 days", value=True)
 
+# --- Display Logo ---
+if client_selection != "All" and client_selection in client_logos:
+    st.image(client_logos[client_selection], width=200)
+
 # --- Fetch News ---
 st.info("Fetching latest news... This may take a few seconds.")
 if client_selection == "All":
@@ -93,7 +109,7 @@ if search_query:
     df = df[df["Title"].str.contains(search_query, case=False, na=False) |
             df["Company"].str.contains(search_query, case=False, na=False)]
 
-# --- Layout Section ---
+# --- Layout Sections ---
 st.markdown("## 🧬 R&D and Data")
 col1, col2 = st.columns(2)
 for category in rd_cats:
@@ -120,7 +136,7 @@ for category in corp_cats:
                 st.markdown(f"[Read more]({row['Link']})")
                 st.markdown("---")
 
-st.markdown("## 🚨 Risk, Regulatory, and Events")
+st.markdown("## 🚨 Risk and Regulatory")
 col5, col6 = st.columns(2)
 for category in risk_cats:
     with col5 if risk_cats.index(category) % 2 == 0 else col6:
@@ -132,3 +148,12 @@ for category in risk_cats:
                 st.markdown(f"{row['Company']} | Published: {row['Published'].strftime('%Y-%m-%d')}  ")
                 st.markdown(f"[Read more]({row['Link']})")
                 st.markdown("---")
+
+st.markdown("## 📅 Upcoming Events and Presentations")
+subset = df[df["Category"].str.contains("Upcoming Event")]
+if not subset.empty:
+    for _, row in subset.iterrows():
+        st.markdown(f"**{row['Title']}**  ")
+        st.markdown(f"{row['Company']} | Published: {row['Published'].strftime('%Y-%m-%d')}  ")
+        st.markdown(f"[Read more]({row['Link']})")
+        st.markdown("---")
