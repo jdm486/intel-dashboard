@@ -3,13 +3,21 @@ import feedparser
 import pandas as pd
 from datetime import datetime, timedelta
 
-# --- Define Clients ---
+# --- Define Clients and Competitors ---
 clients = {
     "Cognito Therapeutics": ["Cognito Therapeutics"],
     "Astria Therapeutics": ["Astria Therapeutics"],
     "Hansa Biopharma": ["Hansa Biopharma"],
     "Tempest Therapeutics": ["Tempest Therapeutics"],
     "Sensius Thermotherapy": ["Sensius Thermotherapy"]
+}
+
+competitors = {
+    "Cognito Therapeutics": ["Sinaptica Therapeutics", "NeuroEM Therapeutics", "Functional Neuromodulation", "OptoCeutics"],
+    "Astria Therapeutics": ["Takeda", "BioCryst", "KalVista Pharmaceuticals", "Pharvaris", "Sanofi", "Roche", "Amgen"],
+    "Hansa Biopharma": ["Alexion", "CSL Behring", "Sobi", "Natera"],
+    "Tempest Therapeutics": ["Arcus Biosciences", "Incyte", "Surface Oncology", "Akeso Biopharma"],
+    "Sensius Thermotherapy": ["Pyrexar Medical", "OncoTherm", "BSD Medical", "ThermMed"]
 }
 
 # --- Keywords for Categorization ---
@@ -84,38 +92,46 @@ st.title("📡 Real time news for Joseph's Clients")
 st.sidebar.header("Filters")
 client_selection = st.sidebar.selectbox("Select client to view", list(clients.keys()) + ["All"])
 search_query = st.sidebar.text_input("Search keyword")
-time_filter = st.sidebar.selectbox("Show updates from:", ["Last 7 days", "Last 30 days", "All time"])
+time_filter = st.sidebar.selectbox("Show updates from:", ["Last 24 hours", "Last 7 days", "Last 30 days", "All time"])
 
 # --- Fetch News ---
 st.info("Fetching latest news... This may take a few seconds.")
 if client_selection == "All":
     all_names = [name for names in clients.values() for name in names]
+    competitor_names = [c for group in competitors.values() for c in group]
 else:
     all_names = clients[client_selection]
+    competitor_names = competitors.get(client_selection, [])
 
-news_entries = fetch_news(all_names)
+client_news = fetch_news(all_names)
+competitor_news = fetch_news(competitor_names)
 
-# --- Create DataFrame ---
-df = pd.DataFrame(news_entries)
-df.dropna(subset=["Published"], inplace=True)
-if time_filter == "Last 7 days":
-    df = df[df["Published"] >= datetime.now() - timedelta(days=7)]
-elif time_filter == "Last 30 days":
-    df = df[df["Published"] >= datetime.now() - timedelta(days=30)]
-if search_query:
-    df = df[df["Title"].str.contains(search_query, case=False, na=False) |
-            df["Company"].str.contains(search_query, case=False, na=False)]
+# --- Create DataFrames ---
+df_clients = pd.DataFrame(client_news)
+df_competitors = pd.DataFrame(competitor_news)
 
-if df.empty:
+for df in [df_clients, df_competitors]:
+    df.dropna(subset=["Published"], inplace=True)
+    if time_filter == "Last 24 hours":
+        df = df[df["Published"] >= datetime.now() - timedelta(days=1)]
+    elif time_filter == "Last 7 days":
+        df = df[df["Published"] >= datetime.now() - timedelta(days=7)]
+    elif time_filter == "Last 30 days":
+        df = df[df["Published"] >= datetime.now() - timedelta(days=30)]
+    if search_query:
+        df = df[df["Title"].str.contains(search_query, case=False, na=False) |
+                df["Company"].str.contains(search_query, case=False, na=False)]
+
+if df_clients.empty and df_competitors.empty:
     st.warning("No news articles found. Try changing your filters or timeframe.")
     st.stop()
 
-# --- Layout Sections ---
-st.markdown("## 🧬 R&D and Data")
+# --- Layout: Client News ---
+st.markdown("## 🧬 Client R&D and Data")
 col1, col2 = st.columns(2)
 for category in rd_cats:
     with col1 if rd_cats.index(category) % 2 == 0 else col2:
-        subset = df[df["Category"].str.contains(category)]
+        subset = df_clients[df_clients["Category"].str.contains(category)]
         if not subset.empty:
             st.subheader(f"🔬 {category}")
             for _, row in subset.iterrows():
@@ -124,11 +140,11 @@ for category in rd_cats:
                 st.markdown(f"[Read more]({row['Link']})")
                 st.markdown("---")
 
-st.markdown("## 🏢 Corporate and Strategic Moves")
+st.markdown("## 🏢 Client Corporate and Strategic Moves")
 col3, col4 = st.columns(2)
 for category in corp_cats:
     with col3 if corp_cats.index(category) % 2 == 0 else col4:
-        subset = df[df["Category"].str.contains(category)]
+        subset = df_clients[df_clients["Category"].str.contains(category)]
         if not subset.empty:
             st.subheader(f"💼 {category}")
             for _, row in subset.iterrows():
@@ -137,11 +153,11 @@ for category in corp_cats:
                 st.markdown(f"[Read more]({row['Link']})")
                 st.markdown("---")
 
-st.markdown("## 🚨 Risk and Regulatory")
+st.markdown("## 🚨 Client Risk and Regulatory")
 col5, col6 = st.columns(2)
 for category in risk_cats:
     with col5 if risk_cats.index(category) % 2 == 0 else col6:
-        subset = df[df["Category"].str.contains(category)]
+        subset = df_clients[df_clients["Category"].str.contains(category)]
         if not subset.empty:
             st.subheader(f"⚠️ {category}")
             for _, row in subset.iterrows():
@@ -150,11 +166,25 @@ for category in risk_cats:
                 st.markdown(f"[Read more]({row['Link']})")
                 st.markdown("---")
 
-st.markdown("## 📅 Upcoming Events and Presentations")
-subset = df[df["Category"].str.contains("Upcoming Event")]
+st.markdown("## 📅 Client Upcoming Events and Presentations")
+subset = df_clients[df_clients["Category"].str.contains("Upcoming Event")]
 if not subset.empty:
     for _, row in subset.iterrows():
         st.markdown(f"**{row['Title']}**  ")
         st.markdown(f"{row['Company']} | Published: {row['Published'].strftime('%Y-%m-%d')}  ")
         st.markdown(f"[Read more]({row['Link']})")
         st.markdown("---")
+
+# --- Layout: Competitor News ---
+st.markdown("## 🧪 Relevant Competitor Information")
+col7, col8 = st.columns(2)
+for category in rd_cats + corp_cats + risk_cats + event_cats:
+    with col7 if (rd_cats + corp_cats + risk_cats + event_cats).index(category) % 2 == 0 else col8:
+        subset = df_competitors[df_competitors["Category"].str.contains(category)]
+        if not subset.empty:
+            st.subheader(f"📌 {category} (Competitor)")
+            for _, row in subset.iterrows():
+                st.markdown(f"**{row['Title']}**  ")
+                st.markdown(f"{row['Company']} | Published: {row['Published'].strftime('%Y-%m-%d')}  ")
+                st.markdown(f"[Read more]({row['Link']})")
+                st.markdown("---")
