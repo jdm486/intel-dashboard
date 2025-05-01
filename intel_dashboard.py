@@ -52,24 +52,28 @@ def categorize(text):
 def fetch_news(names):
     entries = []
     for name in names:
-        feed_url = get_rss_url(name)
-        feed = feedparser.parse(feed_url)
-        for entry in feed.entries:
-            title = entry.title
-            summary = entry.get("summary", "")
-            published = entry.get("published", "")
-            try:
-                pub_date = dme.strptime(published[:16], "%a, %d %b %Y")
-            except:
-                pub_date = None
-            text = f"{title} {summary}"
-            entries.append({
-                "Company": name,
-                "Title": title,
-                "Link": entry.link,
-                "Published": pub_date,
-                "Category": categorize(text)
-            })
+        try:
+            feed_url = get_rss_url(name)
+            feed = feedparser.parse(feed_url)
+            for entry in feed.entries:
+                title = entry.title
+                summary = entry.get("summary", "")
+                published = entry.get("published", "")
+                try:
+                    pub_date = datetime.strptime(published[:16], "%a, %d %b %Y")
+                except:
+                    pub_date = None
+                text = f"{title} {summary}"
+                entries.append({
+                    "Company": name,
+                    "Title": title,
+                    "Link": entry.link,
+                    "Published": pub_date,
+                    "Category": categorize(text)
+                })
+        except Exception as e:
+            st.warning(f"Failed to fetch news for {name}: {e}")
+            continue
     return entries
 
 # --- Streamlit UI ---
@@ -100,11 +104,9 @@ if search_query:
     df = df[df["Title"].str.contains(search_query, case=False, na=False) |
             df["Company"].str.contains(search_query, case=False, na=False)]
 
-# --- Summary Section ---
-st.markdown("## 📊 Summary")
-summary = df.groupby("Category").size().sort_values(ascending=False)
-for cat, count in summary.items():
-    st.markdown(f"- **{cat}**: {count} update{'s' if count > 1 else ''}")
+if df.empty:
+    st.warning("No news articles found. Try changing your filters or timeframe.")
+    st.stop()
 
 # --- Layout Sections ---
 st.markdown("## 🧬 R&D and Data")
