@@ -12,21 +12,15 @@ clients = {
     "Sensius Thermotherapy": ["Sensius Thermotherapy"]
 }
 
-# --- Client Logo Map ---
-client_logos = {
-    "Cognito Therapeutics": "https://files.oaiusercontent.com/file-XH26X7d1L4TBoouauFuYQY?filename=cognito.png",
-    "Astria Therapeutics": "https://files.oaiusercontent.com/file-LswgoQDW9WhKUxvMNUxSsL?filename=astria.png",
-    "Hansa Biopharma": "https://files.oaiusercontent.com/file-QQCRM4i6CUzKbKd476ZhTc?filename=hansa.png",
-    "Tempest Therapeutics": "https://files.oaiusercontent.com/file-5AzVzackqARpJeJeWmN5Gf?filename=tempest.png",
-    "Sensius Thermotherapy": "https://files.oaiusercontent.com/file-8pkPv874tRs1jermmdPqfD?filename=sensius.png"
-}
-
 # --- Keywords for Categorization ---
 categories = {
     "Funding": ["funding", "series", "investment", "raises", "round"],
     "Clinical Trial": ["clinical", "trial", "phase", "enrollment"],
     "Data/Publication": ["data", "publication", "study", "results", "efficacy"],
-    "Leadership Change": ["appoints", "ceo", "cfo", "coo", "chief", "CMO", "CSO", "VP", "joins", "new hire", "head of"],
+    "Personnel & Leadership Changes": [
+        "appoints", "ceo", "cfo", "coo", "chief", "CMO", "CSO", "VP", "joins", "new hire", "head of",
+        "resignation", "resigns", "leaving", "layoffs", "redundancies", "let go", "restructure", "staff cuts", "job cuts", "hiring"
+    ],
     "Partnership/Acquisition": ["partner", "acquire", "acquisition", "merger", "collaborate", "license", "research partner"],
     "Regulatory Update": ["FDA", "EMA", "approval", "designation", "breakthrough", "IND", "NDA"],
     "Commercial Move": ["launch", "commercial", "pricing", "reimbursement", "market access"],
@@ -38,7 +32,7 @@ categories = {
 
 # --- Strategic Groupings ---
 rd_cats = ["Clinical Trial", "Data/Publication", "Pipeline Milestone"]
-corp_cats = ["Funding", "Leadership Change", "Partnership/Acquisition", "Investor Relations"]
+corp_cats = ["Funding", "Personnel & Leadership Changes", "Partnership/Acquisition", "Investor Relations"]
 risk_cats = ["Regulatory Update", "Setback/Risk", "Commercial Move"]
 event_cats = ["Upcoming Event"]
 
@@ -86,10 +80,6 @@ st.sidebar.header("Filters")
 client_selection = st.sidebar.selectbox("Select client to view", list(clients.keys()) + ["All"])
 search_query = st.sidebar.text_input("Search keyword")
 recent_only = st.sidebar.checkbox("Show only last 7 days", value=True)
-
-# --- Display Logo ---
-if client_selection != "All" and client_selection in client_logos:
-    st.image(client_logos[client_selection], width=200)
 
 # --- Fetch News ---
 st.info("Fetching latest news... This may take a few seconds.")
