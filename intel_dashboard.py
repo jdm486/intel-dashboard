@@ -7,9 +7,7 @@ from datetime import datetime, timedelta
 companies = {
     "Cognito Therapeutics": ["Cognito Therapeutics", "NeuroEM", "E-Scape Bio", "Alzheon"],
     "Astria Therapeutics": ["Astria Therapeutics", "Pharvaris", "BioCryst", "Takeda", "KalVista"],
-    "Hansa Biopharma": ["Hansa Biopharma", "Alexion", "Sobi", "CSL Behring"],
-    "Sensius Thermotherapy": ["Sensius Thermotherapy", "Pyrexar", "BSD Medical", "Oncotherm"],
-    "Tempest": ["Tempest", "Pear Therapeutics", "Akili Interactive", "BetterHelp", "Talkspace"]
+    "Hansa Biopharma": ["Hansa Biopharma", "Alexion", "Sobi", "CSL Behring"]
 }
 
 # --- Keywords for Categorization ---
@@ -56,20 +54,23 @@ def fetch_news(name):
     return entries
 
 # --- Streamlit UI ---
-st.set_page_config(page_title="Biotech Intel Dashboard", layout="wide")
-st.title("🧠 Client & Competitor Intelligence Dashboard")
+st.set_page_config(page_title="Real time news for Joseph's Clients", layout="wide")
+st.title("📡 Real time news for Joseph's Clients")
 
 # --- Sidebar Filters ---
 st.sidebar.header("Filters")
-search_query = st.sidebar.text_input("Search company or keyword")
+client_selection = st.sidebar.selectbox("Select client to view", list(companies.keys()) + ["All"])
+search_query = st.sidebar.text_input("Search keyword")
 recent_only = st.sidebar.checkbox("Show only last 7 days", value=True)
+category_filter = st.sidebar.multiselect("Filter by category", list(categories.keys()))
 
 # --- Fetch News ---
 st.info("Fetching latest news... This may take a few seconds.")
 all_entries = []
-for group in companies.values():
-    for name in group:
-        all_entries.extend(fetch_news(name))
+for client, group in companies.items():
+    if client_selection == "All" or client_selection == client:
+        for name in group:
+            all_entries.extend(fetch_news(name))
 
 # --- Create DataFrame ---
 df = pd.DataFrame(all_entries)
@@ -79,8 +80,11 @@ if recent_only:
 if search_query:
     df = df[df["Title"].str.contains(search_query, case=False, na=False) |
             df["Company"].str.contains(search_query, case=False, na=False)]
+if category_filter:
+    df = df[df["Category"].isin(category_filter)]
 
 # --- Display ---
+st.markdown("---")
 df.sort_values("Published", ascending=False, inplace=True)
 for _, row in df.iterrows():
     st.markdown(f"**{row['Title']}**  ")
