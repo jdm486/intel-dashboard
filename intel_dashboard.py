@@ -84,7 +84,7 @@ st.title("📡 Real time news for Joseph's Clients")
 st.sidebar.header("Filters")
 client_selection = st.sidebar.selectbox("Select client to view", list(clients.keys()) + ["All"])
 search_query = st.sidebar.text_input("Search keyword")
-recent_only = st.sidebar.checkbox("Show only last 7 days", value=True)
+time_filter = st.sidebar.selectbox("Show updates from:", ["Last 7 days", "Last 30 days", "All time"])
 
 # --- Fetch News ---
 st.info("Fetching latest news... This may take a few seconds.")
@@ -98,8 +98,10 @@ news_entries = fetch_news(all_names)
 # --- Create DataFrame ---
 df = pd.DataFrame(news_entries)
 df.dropna(subset=["Published"], inplace=True)
-if recent_only:
+if time_filter == "Last 7 days":
     df = df[df["Published"] >= datetime.now() - timedelta(days=7)]
+elif time_filter == "Last 30 days":
+    df = df[df["Published"] >= datetime.now() - timedelta(days=30)]
 if search_query:
     df = df[df["Title"].str.contains(search_query, case=False, na=False) |
             df["Company"].str.contains(search_query, case=False, na=False)]
