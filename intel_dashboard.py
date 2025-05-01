@@ -4,10 +4,15 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 # --- Define Clients and Competitors ---
-companies = {
-    "Cognito Therapeutics": ["Cognito Therapeutics", "NeuroEM", "E-Scape Bio", "Alzheon"],
-    "Astria Therapeutics": ["Astria Therapeutics", "Pharvaris", "BioCryst", "Takeda", "KalVista"],
-    "Hansa Biopharma": ["Hansa Biopharma", "Alexion", "Sobi", "CSL Behring"]
+clients = {
+    "Cognito Therapeutics": ["Cognito Therapeutics"],
+    "Astria Therapeutics": ["Astria Therapeutics"],
+    "Hansa Biopharma": ["Hansa Biopharma"]
+}
+competitors = {
+    "Cognito Therapeutics": ["NeuroEM", "E-Scape Bio", "Alzheon"],
+    "Astria Therapeutics": ["Pharvaris", "BioCryst", "Takeda", "KalVista"],
+    "Hansa Biopharma": ["Alexion", "Sobi", "CSL Behring"]
 }
 
 # --- Keywords for Categorization ---
@@ -21,6 +26,7 @@ categories = {
     "Commercial Move": ["launch", "commercial", "pricing", "reimbursement", "market access"],
     "Investor Relations": ["earnings", "quarterly", "shareholder", "investor", "guidance"],
     "Pipeline Milestone": ["milestone", "readout", "development", "update"],
+    "Conference/Presentation": ["conference", "presenting at", "presentation", "poster", "abstract"],
     "Setback/Risk": ["pause", "terminated", "hold", "FDA rejection", "negative"]
 }
 
@@ -36,26 +42,27 @@ def categorize(text):
             tags.append(cat)
     return ", ".join(tags) if tags else "Other"
 
-def fetch_news(name):
-    feed_url = get_rss_url(name)
-    feed = feedparser.parse(feed_url)
+def fetch_news(names):
     entries = []
-    for entry in feed.entries:
-        title = entry.title
-        summary = entry.get("summary", "")
-        published = entry.get("published", "")
-        try:
-            pub_date = datetime.strptime(published[:16], "%a, %d %b %Y")
-        except:
-            pub_date = None
-        text = f"{title} {summary}"
-        entries.append({
-            "Company": name,
-            "Title": title,
-            "Link": entry.link,
-            "Published": pub_date,
-            "Category": categorize(text)
-        })
+    for name in names:
+        feed_url = get_rss_url(name)
+        feed = feedparser.parse(feed_url)
+        for entry in feed.entries:
+            title = entry.title
+            summary = entry.get("summary", "")
+            published = entry.get("published", "")
+            try:
+                pub_date = datetime.strptime(published[:16], "%a, %d %b %Y")
+            except:
+                pub_date = None
+            text = f"{title} {summary}"
+            entries.append({
+                "Company": name,
+                "Title": title,
+                "Link": entry.link,
+                "Published": pub_date,
+                "Category": categorize(text)
+            })
     return entries
 
 # --- Streamlit UI ---
@@ -64,21 +71,22 @@ st.title("📡 Real time news for Joseph's Clients")
 
 # --- Sidebar Filters ---
 st.sidebar.header("Filters")
-client_selection = st.sidebar.selectbox("Select client to view", list(companies.keys()) + ["All"])
+client_selection = st.sidebar.selectbox("Select client to view", list(clients.keys()) + ["All"])
 search_query = st.sidebar.text_input("Search keyword")
 recent_only = st.sidebar.checkbox("Show only last 7 days", value=True)
 category_filter = st.sidebar.multiselect("Filter by category", list(categories.keys()))
 
 # --- Fetch News ---
 st.info("Fetching latest news... This may take a few seconds.")
-all_entries = []
-for client, group in companies.items():
-    if client_selection == "All" or client_selection == client:
-        for name in group:
-            all_entries.extend(fetch_news(name))
+if client_selection == "All":
+    all_names = [name for names in clients.values() for name in names]
+else:
+    all_names = clients[client_selection]
+
+news_entries = fetch_news(all_names)
 
 # --- Create DataFrame ---
-df = pd.DataFrame(all_entries)
+df = pd.DataFrame(news_entries)
 df.dropna(subset=["Published"], inplace=True)
 if recent_only:
     df = df[df["Published"] >= datetime.now() - timedelta(days=7)]
