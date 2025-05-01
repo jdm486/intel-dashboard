@@ -19,8 +19,9 @@ categories = {
     "Data/Publication": ["data", "publication", "study", "results", "efficacy"],
     "Personnel & Leadership Changes": [
         "appoints", "ceo", "cfo", "coo", "chief", "CMO", "CSO", "VP", "joins", "new hire", "head of",
-        "resignation", "resigns", "leaving", "layoffs", "redundancies", "let go", "restructure", "staff cuts", "job cuts", "hiring"
+        "resignation", "resigns", "leaving", "layoffs", "redundancies", "let go", "restructure", "staff cuts", "job cuts"
     ],
+    "Job Postings": ["hiring", "job opening", "now hiring", "career opportunity", "apply now", "recruiting"],
     "Partnership/Acquisition": ["partner", "acquire", "acquisition", "merger", "collaborate", "license", "research partner"],
     "Regulatory Update": ["FDA", "EMA", "approval", "designation", "breakthrough", "IND", "NDA"],
     "Commercial Move": ["launch", "commercial", "pricing", "reimbursement", "market access"],
@@ -32,7 +33,7 @@ categories = {
 
 # --- Strategic Groupings ---
 rd_cats = ["Clinical Trial", "Data/Publication", "Pipeline Milestone"]
-corp_cats = ["Funding", "Personnel & Leadership Changes", "Partnership/Acquisition", "Investor Relations"]
+corp_cats = ["Funding", "Personnel & Leadership Changes", "Job Postings", "Partnership/Acquisition", "Investor Relations"]
 risk_cats = ["Regulatory Update", "Setback/Risk", "Commercial Move"]
 event_cats = ["Upcoming Event"]
 
