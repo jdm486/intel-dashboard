@@ -148,7 +148,7 @@ for category in rd_cats:
     with col1 if rd_cats.index(category) % 2 == 0 else col2:
         subset = df_clients[df_clients["Category"].str.contains(category)]
         if not subset.empty:
-            st.markdown(f"### 🔍 <small>{category}</small>", unsafe_allow_html=True)
+            st.markdown(f"#### 🔍 <small>{{category}}</small>", unsafe_allow_html=True)
             for _, row in subset.iterrows():
                 st.markdown(f"**{row['Title']}**  ")
                 st.markdown(f"{row['Company']} | Published: {row['Published'].strftime('%Y-%m-%d')}  ")
@@ -197,7 +197,7 @@ for category in rd_cats + corp_cats + risk_cats + event_cats:
     with col7 if (rd_cats + corp_cats + risk_cats + event_cats).index(category) % 2 == 0 else col8:
         subset = df_competitors[df_competitors["Category"].str.contains(category)]
         if not subset.empty:
-            st.markdown(f"### 📎 <small>{category} (Competitor)</small>", unsafe_allow_html=True)
+            st.markdown(f"#### 📎 <small>{category} (Competitor)</small>", unsafe_allow_html=True)
             for _, row in subset.iterrows():
                 st.markdown(f"**{row['Title']}**  ")
                 st.markdown(f"{row['Company']} | Published: {row['Published'].strftime('%Y-%m-%d')}  ")
