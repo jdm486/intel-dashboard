@@ -15,8 +15,13 @@ categories = {
     "Funding": ["funding", "series", "investment", "raises", "round"],
     "Clinical Trial": ["clinical", "trial", "phase", "enrollment"],
     "Data/Publication": ["data", "publication", "study", "results", "efficacy"],
-    "Leadership Change": ["appoints", "ceo", "cfo", "coo", "chief"],
-    "Partnership/Acquisition": ["partner", "acquire", "acquisition", "merger"]
+    "Leadership Change": ["appoints", "ceo", "cfo", "coo", "chief", "CMO", "CSO", "VP", "joins", "new hire", "head of"],
+    "Partnership/Acquisition": ["partner", "acquire", "acquisition", "merger", "collaborate", "license", "research partner"],
+    "Regulatory Update": ["FDA", "EMA", "approval", "designation", "breakthrough", "IND", "NDA"],
+    "Commercial Move": ["launch", "commercial", "pricing", "reimbursement", "market access"],
+    "Investor Relations": ["earnings", "quarterly", "shareholder", "investor", "guidance"],
+    "Pipeline Milestone": ["milestone", "readout", "development", "update"],
+    "Setback/Risk": ["pause", "terminated", "hold", "FDA rejection", "negative"]
 }
 
 # --- Utility Functions ---
@@ -27,7 +32,7 @@ def categorize(text):
     tags = []
     lower_text = text.lower()
     for cat, keys in categories.items():
-        if any(k in lower_text for k in keys):
+        if any(k.lower() in lower_text for k in keys):
             tags.append(cat)
     return ", ".join(tags) if tags else "Other"
 
@@ -81,14 +86,19 @@ if search_query:
     df = df[df["Title"].str.contains(search_query, case=False, na=False) |
             df["Company"].str.contains(search_query, case=False, na=False)]
 if category_filter:
-    df = df[df["Category"].isin(category_filter)]
+    df = df[df["Category"].apply(lambda x: any(cat in x for cat in category_filter))]
 
-# --- Display ---
+# --- Display by Category ---
 st.markdown("---")
+st.subheader("🗂️ Categorized Updates")
 df.sort_values("Published", ascending=False, inplace=True)
-for _, row in df.iterrows():
-    st.markdown(f"**{row['Title']}**  ")
-    st.markdown(f"{row['Company']} — {row['Category']}  ")
-    st.markdown(f"Published: {row['Published'].strftime('%Y-%m-%d')}  ")
-    st.markdown(f"[Read more]({row['Link']})")
-    st.markdown("---")
+
+for category in sorted(df["Category"].unique()):
+    st.markdown(f"### {category}")
+    subset = df[df["Category"] == category]
+    for _, row in subset.iterrows():
+        st.markdown(f"**{row['Title']}**  ")
+        st.markdown(f"{row['Company']}  ")
+        st.markdown(f"Published: {row['Published'].strftime('%Y-%m-%d')}  ")
+        st.markdown(f"[Read more]({row['Link']})")
+        st.markdown("---")
