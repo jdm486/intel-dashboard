@@ -107,8 +107,23 @@ client_news = fetch_news(all_names)
 competitor_news = fetch_news(competitor_names)
 
 # --- Create DataFrames ---
-df_clients = pd.DataFrame(client_news)
-df_competitors = pd.DataFrame(competitor_news)
+
+def filter_dataframe(df):
+    df = df.copy()
+    df.dropna(subset=["Published"], inplace=True)
+    if time_filter == "Last 24 hours":
+        df = df[df["Published"] >= datetime.now() - timedelta(days=1)]
+    elif time_filter == "Last 7 days":
+        df = df[df["Published"] >= datetime.now() - timedelta(days=7)]
+    elif time_filter == "Last 30 days":
+        df = df[df["Published"] >= datetime.now() - timedelta(days=30)]
+    if search_query:
+        df = df[df["Title"].str.contains(search_query, case=False, na=False) |
+                df["Company"].str.contains(search_query, case=False, na=False)]
+    return df
+
+df_clients = filter_dataframe(pd.DataFrame(client_news))
+df_competitors = filter_dataframe(pd.DataFrame(competitor_news))
 
 for df in [df_clients, df_competitors]:
     df.dropna(subset=["Published"], inplace=True)
