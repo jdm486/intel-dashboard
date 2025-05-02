@@ -85,8 +85,8 @@ def fetch_news(names):
     return entries
 
 # --- Streamlit UI ---
-st.set_page_config(page_title="Real time news for Joseph's Clients", layout="wide")
-st.title("📡 Real time news for Joseph's Clients")
+st.set_page_config(page_title="Real time news for Joseph's Company Watch List", layout="wide")
+st.title("📡 Real time news for Joseph's Company Watch List")
 
 # --- Sidebar Filters ---
 st.sidebar.header("Filters")
