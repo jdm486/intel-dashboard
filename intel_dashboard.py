@@ -90,7 +90,7 @@ st.title("📡 Real time news for Joseph's Company Watch List")
 
 # --- Sidebar Filters ---
 st.sidebar.header("Filters")
-client_selection = st.sidebar.selectbox("Select client to view", list(clients.keys()) + ["All"])
+client_selection = st.sidebar.selectbox("Select company to view", list(clients.keys()) + ["All"])
 search_query = st.sidebar.text_input("Search keyword")
 time_filter = st.sidebar.selectbox("Show updates from:", ["Last 24 hours", "Last 7 days", "Last 30 days", "All time"])
 
