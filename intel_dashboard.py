@@ -142,7 +142,7 @@ if df_clients.empty and df_competitors.empty:
     st.stop()
 
 # --- Layout: Client News ---
-st.markdown("## 🧬 Client R&D and Data")
+st.markdown("## 🧬 Company R&D and Data")
 col1, col2 = st.columns(2)
 for category in rd_cats:
     with col1 if rd_cats.index(category) % 2 == 0 else col2:
@@ -155,7 +155,7 @@ for category in rd_cats:
                 st.markdown(f"[Read more]({row['Link']})")
                 st.markdown("---")
 
-st.markdown("## 🚨 Client Risk and Regulatory")
+st.markdown("## 🚨 Company Risk and Regulatory")
 col5, col6 = st.columns(2)
 for category in risk_cats:
     with col5 if risk_cats.index(category) % 2 == 0 else col6:
@@ -168,7 +168,7 @@ for category in risk_cats:
                 st.markdown(f"[Read more]({row['Link']})")
                 st.markdown("---")
 
-st.markdown("## 📅 Client Upcoming Events and Presentations")
+st.markdown("## 📅 Company Upcoming Events and Presentations")
 subset = df_clients[df_clients["Category"].str.contains("Upcoming Event")]
 if not subset.empty:
     for _, row in subset.iterrows():
