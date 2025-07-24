@@ -92,4 +92,5 @@ st.title("📡 Real time news for Joseph's Company Watch List")
 # --- Sidebar Filters ---
 st.sidebar.header("Filters")
 client_selection = st.sidebar.selectbox("Select company to view", list(clients.keys()) + ["All"])
-search_query = st.sideba_
+search_query = st.sidebar.text_input("Enter company name")
+
