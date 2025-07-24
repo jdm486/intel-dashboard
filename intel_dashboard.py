@@ -19,8 +19,17 @@ competitors = {
     "Astria Therapeutics": ["Takeda", "BioCryst", "KalVista Pharmaceuticals", "Pharvaris", "Sanofi", "Roche", "Amgen"],
     "Hansa Biopharma": ["Alexion", "CSL Behring", "Sobi", "Natera"],
     "Tempest Therapeutics": ["Arcus Biosciences", "Incyte", "Surface Oncology", "Akeso Biopharma"],
-    "Sensius Thermotherapy": ["Pyrexar Medical", "OncoTherm", "BSD Medical", "ThermMed"]
+    "Sensius Thermotherapy": ["Pyrexar Medical", "OncoTherm", "BSD Medical", "ThermMed"],
+    "Eleva Biologics": [
+        "Samsung Biologics", 
+        "WuXi Biologics", 
+        "Lonza Group", 
+        "Selexis", 
+        "GlycoThera", 
+        "Rentschler Biopharma"
+    ]  # ✅ Eleva competitors added
 }
+
 
 # --- Keywords for Categorization ---
 categories = {
