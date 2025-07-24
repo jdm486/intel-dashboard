@@ -5,13 +5,14 @@ from datetime import datetime, timedelta
 
 # --- Define Clients and Competitors ---
 clients = {
-   Cognito Therapeutics": ["Cognito Therapeutics"],
+    "Cognito Therapeutics": ["Cognito Therapeutics"],
     "Astria Therapeutics": ["Astria Therapeutics"],
     "Hansa Biopharma": ["Hansa Biopharma"],
     "Tempest Therapeutics": ["Tempest Therapeutics"],
     "Sensius Thermotherapy": ["Sensius Thermotherapy"],
     "Eleva Biologics": ["Eleva Biologics"]
 }
+
 
 competitors = {
     "Cognito Therapeutics": ["Sinaptica Therapeutics", "NeuroEM Therapeutics", "Functional Neuromodulation", "OptoCeutics"],
